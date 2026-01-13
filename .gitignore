@@ -1,0 +1,19 @@
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment variables / API Keys
+api_key.py
+.env
+
+# Vector database
+chroma_db/
+
+# Streamlit
+.streamlit/
+
+# IDE settings
+.vscode/
+.cursor/

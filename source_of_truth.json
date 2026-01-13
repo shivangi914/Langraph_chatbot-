@@ -1,0 +1,34 @@
+{
+  "company_info": {
+    "name": "AutoStream",
+    "description": "A SaaS product providing automated video editing tools for content creators.",
+    "parent_company": "ServiceHive",
+    "platform": "Inflx",
+    "mission": "Converting social media conversations into qualified business leads."
+  },
+  "services": [
+    "Automated Video Editing",
+    "AI Captions",
+    "4K Video Exporting",
+    "Lead Generation"
+  ],
+  "pricing_features": {
+    "basic_plan": {
+      "price": "$29/month",
+      "videos_per_month": 10,
+      "resolution": "720p",
+      "support": "Standard"
+    },
+    "pro_plan": {
+      "price": "$79/month",
+      "videos_per_month": "Unlimited",
+      "resolution": "4K",
+      "ai_captions": true,
+      "support": "24/7 Priority"
+    }
+  },
+  "policies": {
+    "refund_policy": "No refunds after 7 days",
+    "support": "24/7 support only on Pro"
+  }
+}
