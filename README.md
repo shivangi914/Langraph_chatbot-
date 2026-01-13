@@ -33,10 +33,11 @@ pip install -r requirements.txt
 ```
 
 ### 3. Configure API Key
-Ensure your `api_key.py` file contains your valid Gemini key:
-```python
-GEMINI_API_KEY = "YOUR_API_KEY_HERE"
-```
+To keep your credentials safe, the `api_key.py` file is ignored by Git. To set up your key:
+1. Copy the provided template: `cp api_key_template.py api_key.py` (or manually copy and rename it).
+2. Open `api_key.py` and replace `"YOUR_API_KEY_HERE"` with your actual Google Gemini API key.
+
+Alternatively, you can set an environment variable named `GOOGLE_API_KEY`.
 
 ---
 

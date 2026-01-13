@@ -1,13 +1,23 @@
 import logging
+import os
 from src.rag_engine import RAGEngine
 from src.chatbot_agent import AutoStreamAgent
 from langgraph.graph import END
-from api_key import GEMINI_API_KEY
+
+# Try to load API key from file or environment
+try:
+    from api_key import GEMINI_API_KEY
+except ImportError:
+    GEMINI_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 # Configure logging
 logging.basicConfig(level=logging.WARNING)
 
 def main():
+    if not GEMINI_API_KEY:
+        print("Error: Gemini API key not found. Please set GOOGLE_API_KEY environment variable or create api_key.py.")
+        return
+
     # Initialize Engine and Agent
     rag_engine = RAGEngine(
         md_path="source_of_truth.md",

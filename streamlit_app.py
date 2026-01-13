@@ -1,15 +1,26 @@
 import streamlit as st
 import logging
+import os
 from src.rag_engine import RAGEngine
 from src.chatbot_agent import AutoStreamAgent
 from langgraph.graph import END
-from api_key import GEMINI_API_KEY
+
+# Try to load API key from file or environment
+try:
+    from api_key import GEMINI_API_KEY
+except ImportError:
+    GEMINI_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 # Configure logging
 logging.basicConfig(level=logging.WARNING)
 
 st.set_page_config(page_title="AutoStream AI", page_icon="🎥")
 st.title("🎥 AutoStream AI Assistant")
+
+if not GEMINI_API_KEY:
+    st.error("Gemini API key not found. Please set GOOGLE_API_KEY environment variable or create api_key.py.")
+    st.info("Check README.md for instructions on how to set up your API key.")
+    st.stop()
 
 # Initialize Objects in Session State
 if "rag_engine" not in st.session_state:
