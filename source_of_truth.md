@@ -7,6 +7,18 @@ AutoStream is a SaaS product that provides automated video editing tools for con
 - 4K Export: High-resolution video exports available on premium plans.
 - Lead Generation: Powered by Inflx, helping creators convert engagement into business.
 
+# Supported Platforms
+We support automated editing and lead generation for all major social media platforms, including:
+- YouTube (Long-form and Shorts)
+- Instagram (Reels and Posts)
+- TikTok
+- LinkedIn (Video content and Lead gen)
+- Twitter / X
+- Facebook (Watch and Reels)
+- Twitch (Stream highlights)
+- Snapchat (Spotlight)
+- Pinterest (Video pins)
+
 # Pricing & Features
 
 ## Basic Plan

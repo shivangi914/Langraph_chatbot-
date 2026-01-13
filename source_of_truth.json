@@ -12,6 +12,17 @@
     "4K Video Exporting",
     "Lead Generation"
   ],
+  "supported_platforms": [
+    "YouTube (Long-form, Shorts)",
+    "Instagram (Reels, Posts)",
+    "TikTok",
+    "LinkedIn",
+    "Twitter / X",
+    "Facebook",
+    "Twitch",
+    "Snapchat",
+    "Pinterest"
+  ],
   "pricing_features": {
     "basic_plan": {
       "price": "$29/month",

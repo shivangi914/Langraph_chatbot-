@@ -62,6 +62,19 @@ Classification (output only the category name):
 """)
         self.intent_chain = intent_prompt | self.llm | StrOutputParser()
 
+        # Input Validation Chain (to distinguish between info and questions)
+        validation_prompt = PromptTemplate.from_template("""
+A user is in a sign-up flow. The agent just asked: "{question}"
+The user replied: "{user_input}"
+
+Is the user:
+1. answering: Providing the information requested (a name, an email, or a platform).
+2. questioning: Asking a clarifying question or seeking information (e.g., "what platforms do you support?", "why do you need my email?").
+
+Output only the word "answering" or "questioning".
+""")
+        self.validation_chain = validation_prompt | self.llm | StrOutputParser()
+
         # RAG Chain
         rag_prompt = PromptTemplate.from_template("""
 You are a helpful and human-friendly assistant for AutoStream, a SaaS product by ServiceHive. 
@@ -144,34 +157,64 @@ Answer:
         ls = state['lead_state']
         user_input = state.get('user_input', '')
         is_streamlit = state.get('is_streamlit', False)
+        state['agent_response'] = None
 
+        # Determine which question we are expecting an answer for
+        is_answering = state.get('asked_name') or state.get('asked_email') or state.get('asked_platform')
+        
+        # If the user is replying to a specific question, validate it
+        if user_input and is_answering:
+            # Get the actual question text we asked last turn
+            question_text = ""
+            if state.get('asked_name'): question_text = "May I have your name?"
+            elif state.get('asked_email'): question_text = "What is your email address?"
+            elif state.get('asked_platform'): question_text = "Which platform do you use?"
+
+            validation = self.validation_chain.invoke({"question": question_text, "user_input": user_input}).strip().lower()
+            
+            if "questioning" in validation:
+                # User asked a clarifying question instead of answering
+                logger.info("Clarifying question detected during lead qual.")
+                context = "\n---\n".join(self.rag_engine.retrieve(user_input))
+                rag_answer = self.rag_chain.invoke({"context": context, "question": user_input})
+                state['agent_response'] = f"{rag_answer}\n\nAnyway, {question_text}"
+                state['step'] = 'await_user'
+                return state
+
+        # Proceed with normal info capture
         if not ls.get("name"):
             if is_streamlit:
                 if not state.get('asked_name'):
-                    state.update({'agent_response': "May I have your name?", 'asked_name': True, 'step': 'await_user'})
+                    # First time asking
+                    state.update({'agent_response': "Great! To get started, may I have your name?", 'asked_name': True, 'step': 'await_user'})
                     return state
-                ls["name"], state['asked_name'] = user_input, False
+                # We were waiting for the name, and we got it
+                ls["name"] = user_input
+                state['asked_name'] = False
             else:
                 ls["name"] = input("Name: ")
 
         if ls.get("name") and not ls.get("email"):
             if is_streamlit:
                 if not state.get('asked_email'):
-                    state.update({'agent_response': "What is your email address?", 'asked_email': True, 'step': 'await_user'})
+                    state.update({'agent_response': "Thanks! Now, what is your email address?", 'asked_email': True, 'step': 'await_user'})
                     return state
-                ls["email"], state['asked_email'] = user_input, False
+                ls["email"] = user_input
+                state['asked_email'] = False
             else:
                 ls["email"] = input("Email: ")
 
         if ls.get("name") and ls.get("email") and not ls.get("platform"):
             if is_streamlit:
                 if not state.get('asked_platform'):
-                    state.update({'agent_response': "Which platform do you use?", 'asked_platform': True, 'step': 'await_user'})
+                    state.update({'agent_response': "Almost there! Which creator platform do you use (YouTube, Instagram, etc.)?", 'asked_platform': True, 'step': 'await_user'})
                     return state
-                ls["platform"], state['asked_platform'] = user_input, False
+                ls["platform"] = user_input
+                state['asked_platform'] = False
             else:
                 ls["platform"] = input("Platform: ")
 
+        state['lead_state'] = ls
         state['step'] = 'lead_capture' if all(ls.values()) else 'await_user'
         return state
 
